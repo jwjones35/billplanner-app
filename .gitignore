@@ -1,0 +1,14 @@
+# This repo is PUBLIC (GitHub Pages). Personal data must never be committed.
+*.csv
+*backup*.json
+*starter*.json
+*private*
+
+# Notes for Claude, not part of the app
+CLAUDE.md
+
+# Windows clutter
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
