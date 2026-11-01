@@ -4,6 +4,9 @@ See what's due, what's coming in, and what's available to spend until your next 
 
 Bill Planner is a web app you add to your phone's Home Screen. It has no accounts and no servers: everything you enter stays on your device.
 
+- Website: https://jwjones35.github.io/billplanner-app/
+- The app: https://jwjones35.github.io/billplanner-app/app/
+
 ## What it does
 
 - Bills and paydays in one place, with **Available to spend** until your next payday.

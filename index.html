@@ -3,31 +3,130 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bill Planner</title>
-<meta name="description" content="Bills, paydays and what's available to spend. Your data stays on your device.">
+<title>Bill Planner: free bill and payday planner, no account needed</title>
+<meta name="description" content="Know what you can spend until payday. Bill Planner is a free bill tracker and payday planner for your phone. No account, no bank login needed, and your information stays on your device.">
+<link rel="canonical" href="https://jwjones35.github.io/billplanner-app/">
 <meta name="theme-color" content="#f3ede2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#110d22" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Bills">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bill Planner: know what you can spend until payday">
+<meta property="og:description" content="A free bill and payday planner. No account, no bank login needed, and everything stays on your phone.">
+<meta property="og:url" content="https://jwjones35.github.io/billplanner-app/">
+<meta property="og:image" content="https://jwjones35.github.io/billplanner-app/img/1-home.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="landing.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Bill Planner",
+  "url": "https://jwjones35.github.io/billplanner-app/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web, iPhone, Android",
+  "description": "A free bill tracker and payday planner that shows what you can spend until your next payday. No account needed; data stays on your device.",
+  "image": "https://jwjones35.github.io/billplanner-app/img/1-home.png",
+  "author": { "@type": "Person", "name": "Jimmy Jones" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
 </head>
 <body>
-<main id="view" aria-live="polite"></main>
-<nav id="tabs" aria-label="Sections">
-  <button data-act="tab" data-tab="home"><span class="ti">&#8962;</span>Home</button>
-  <button data-act="tab" data-tab="pay"><span class="ti">&#36;</span>Paydays</button>
-  <button data-act="tab" data-tab="bills"><span class="ti">&#9776;</span>Bills</button>
-  <button data-act="tab" data-tab="more"><span class="ti">&#8943;</span>More</button>
-</nav>
-<div id="scrim" data-act="close" hidden></div>
-<section id="sheet" role="dialog" aria-modal="true" hidden></section>
-<div id="toast" role="status" hidden></div>
-<script src="whatsnew.js"></script>
-<script src="app.js"></script>
+
+<header class="top">
+  <a class="brand" href="./"><img src="img/icon-192.png" alt="" width="40" height="40"><span>Bill Planner</span></a>
+  <a class="btn small" href="app/">Open the app</a>
+</header>
+
+<main>
+  <section class="panel hero">
+    <h1>Know what you can spend <span class="pop">until payday.</span></h1>
+    <p class="lead">Bill Planner is a <b>free bill and payday planner</b> for your phone. Add your bills and paychecks once, and it shows how much is really available to spend before your next payday, after the bills due before then.</p>
+    <p class="lead"><b>No account. No bank login needed. Your information stays on your phone.</b></p>
+    <div class="cta">
+      <a class="btn big" href="app/">Open Bill Planner</a>
+      <a class="btn ghost" href="#install">Add it to your phone</a>
+    </div>
+    <p class="small muted">Free, no ads, no tracking. Works on iPhone, Android and computers.</p>
+  </section>
+
+  <section class="shots" aria-label="Screenshots">
+    <figure><img src="img/1-home.png" alt="Home screen: $590.55 available to spend until payday, with this week's bills" width="390" height="844" loading="lazy"><figcaption>What you can spend until payday</figcaption></figure>
+    <figure><img src="img/2-paydays.png" alt="Paydays screen: each paycheck with the bills it covers and what's left over" width="390" height="844" loading="lazy"><figcaption>Each paycheck and the bills it covers</figcaption></figure>
+    <figure><img src="img/3-bills.png" alt="Bills screen: every bill with its amount and next due date" width="390" height="844" loading="lazy"><figcaption>All your bills in one place</figcaption></figure>
+  </section>
+
+  <h2>What it does</h2>
+  <section class="grid">
+    <div class="panel"><h3>Available to spend</h3><p>One big number: what's left until your next payday after the bills due before then, with a plain explanation of how it was worked out.</p></div>
+    <div class="panel"><h3>Next week, too</h3><p>A warning when next week's bills are bigger than next week's pay, so you don't overspend this week and come up short.</p></div>
+    <div class="panel"><h3>Nothing slips by</h3><p>Past-due bills stand out, autopay bills that haven't gone through are flagged, and payments the bank hasn't shown yet are tracked.</p></div>
+    <div class="panel"><h3>Real-life bills</h3><p>Weekly, every other week, monthly or one-time bills. Bills that change each month, like electric. Transaction fees too.</p></div>
+    <div class="panel"><h3>Money set aside</h3><p>Holding money for a car repair or a big bill? Set it aside so it isn't counted as spendable. Savings tips appear when there's room to save.</p></div>
+    <div class="panel"><h3>Reminders</h3><p>Put every bill in your phone's calendar with alerts, so you're reminded even when the app is closed.</p></div>
+  </section>
+
+  <section class="panel" id="privacy">
+    <h2 class="in">Private by design</h2>
+    <ul class="ticks">
+      <li><b>No account or sign-up.</b> Open it and start.</li>
+      <li><b>Your information stays on your device.</b> Bill Planner has no servers, so nothing you enter is sent to anyone.</li>
+      <li><b>No ads and no tracking.</b></li>
+      <li><b>Your bank login is never needed.</b> Type in your balance from your bank's app. If you want balances to update by themselves, you can optionally connect your bank through SimpleFIN Bridge, a separate paid service, where you sign in on their website, never in Bill Planner.</li>
+      <li><b>Backups are yours.</b> Save a backup file wherever you like, such as iCloud Drive or Google Drive.</li>
+    </ul>
+  </section>
+
+  <section class="panel" id="install">
+    <h2 class="in">Add it to your phone</h2>
+    <p>Bill Planner runs in your phone's web browser and can be added to your Home Screen like any other app. There's nothing to download from an app store.</p>
+    <div class="two">
+      <div>
+        <h3>iPhone</h3>
+        <ol>
+          <li>Open <b><a href="app/">jwjones35.github.io/billplanner-app/app</a></b> in <b>Safari</b>.</li>
+          <li>Tap the <b>Share</b> button (the square with an arrow pointing up).</li>
+          <li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Android</h3>
+        <ol>
+          <li>Open <b><a href="app/">jwjones35.github.io/billplanner-app/app</a></b> in <b>Chrome</b>.</li>
+          <li>Tap the <b>⋮</b> menu in the top-right corner.</li>
+          <li>Tap <b>Add to Home screen</b> or <b>Install app</b>.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <h2>Questions</h2>
+  <section class="faq">
+    <details class="panel"><summary>Is Bill Planner really free?</summary><p>Yes. There's no charge, no ads and no trial period. If it helps you, there's an optional tip button, but the app stays free either way.</p></details>
+    <details class="panel"><summary>Do I have to give it my bank login?</summary><p>No. You type in your checking balance from your bank's app now and then. Connecting a bank is optional, and even then you sign in on SimpleFIN's website, never in Bill Planner.</p></details>
+    <details class="panel"><summary>Where is my information kept?</summary><p>Only on your own phone or computer, inside the browser. Nothing is sent anywhere, because Bill Planner has no servers. That also means you should save a backup file now and then.</p></details>
+    <details class="panel"><summary>Does it work without internet?</summary><p>Yes. Once you've opened it, Bill Planner works offline. (Connecting a bank, if you choose to, needs internet to update.)</p></details>
+    <details class="panel"><summary>What if I get a new phone?</summary><p>Save a backup file from the app (More › Backup), then open Bill Planner on the new phone and choose "Restore a backup file".</p></details>
+    <details class="panel"><summary>Is this financial advice?</summary><p>No. Bill Planner is a planning tool. Its numbers are only as good as what's entered and what your bank reports, so always check your bank before making a payment you can't undo.</p></details>
+  </section>
+
+  <section class="panel support">
+    <h2 class="in">Made by one person</h2>
+    <p>Bill Planner is built by one person to answer one simple question: "what can I spend this week?" If it helps you, a small tip keeps it going.</p>
+    <div class="tip-wrap"><a class="btn tip" href="https://buymeacoffee.com/jwjones35" target="_blank" rel="noopener"><span class="tip-cup" aria-hidden="true">☕</span>Buy me a coffee</a><div class="tip-burst" aria-hidden="true"><span>THANKS!</span></div></div>
+    <p class="small muted">Opens Buy Me a Coffee, a separate website. Tipping is completely optional.</p>
+  </section>
+
+  <section class="final">
+    <a class="btn big" href="app/">Open Bill Planner</a>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Jimmy Jones · <a href="https://github.com/jwjones35/billplanner-app/blob/main/LICENSE">Licence</a> · <a href="#privacy">Privacy</a></p>
+  <p class="small">Bill Planner is a planning tool, not financial advice.</p>
+</footer>
+
 </body>
 </html>

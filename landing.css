@@ -1,0 +1,120 @@
+/* Bill Planner web page: the same inked-comic look as the app (ink outlines, hard shadows, halftone dots). */
+:root {
+  --bg: #f3ede2; --card: #fffcf6; --text: #1a1433; --muted: #5c5577; --line: #e2d9c8;
+  --brand: #007a68; --brand-ink: #ffffff; --chip: #ece3d3; --pop: #c25b00;
+  --ink: #1a1433; --hl: rgba(255,255,255,.6); --shade: rgba(26,20,51,.07); --dots: rgba(26,20,51,.13);
+  --link: #006a5a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #110d22; --card: #1c1636; --text: #f4effd; --muted: #a99fcb; --line: #2f2758;
+    --brand: #1fd1aa; --brand-ink: #04201a; --chip: #2b2350; --pop: #ffb52e;
+    --ink: #04020b; --hl: rgba(255,255,255,.07); --shade: rgba(0,0,0,.24); --dots: rgba(0,0,0,.38);
+    --link: #1fd1aa;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 17px; line-height: 1.5;
+}
+a { color: var(--link); }
+main { max-width: 860px; margin: 0 auto; padding: 0 16px 24px; }
+h1, h2, h3 { line-height: 1.15; margin: 0 0 10px; }
+h1 { font-size: clamp(32px, 7vw, 52px); font-weight: 900; letter-spacing: -.01em; }
+h2 { font-size: 26px; font-weight: 900; margin: 34px 0 14px; }
+h2.in { margin-top: 0; }
+h3 { font-size: 19px; font-weight: 800; }
+p { margin: 0 0 12px; }
+.small { font-size: 14px; }
+.muted { color: var(--muted); }
+.pop { color: var(--pop); text-shadow: 3px 3px 0 var(--ink); }
+@media (prefers-color-scheme: light) { .pop { text-shadow: 2px 2px 0 rgba(26,20,51,.25); } }
+
+/* Header */
+.top {
+  max-width: 860px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 900; font-size: 20px; }
+.brand img { border-radius: 10px; border: 2px solid var(--ink); }
+
+/* Comic panels */
+.panel {
+  background: var(--card); border: 2px solid var(--ink); border-radius: 16px; padding: 18px;
+  box-shadow: 5px 5px 0 var(--ink); position: relative; isolation: isolate; margin-top: 18px;
+  background-image: linear-gradient(180deg, var(--hl) 0 9px, transparent 9px), linear-gradient(155deg, transparent 0 64%, var(--shade) 64%);
+}
+.panel::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  background-image: radial-gradient(var(--dots) 1.1px, transparent 1.7px); background-size: 7px 7px;
+  -webkit-mask-image: linear-gradient(155deg, transparent 0 64%, #000 64%); mask-image: linear-gradient(155deg, transparent 0 64%, #000 64%);
+}
+.hero { padding: 26px 20px; margin-top: 6px; box-shadow: 7px 7px 0 var(--ink); }
+.lead { font-size: 19px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px;
+  border-radius: 12px; border: 2px solid var(--ink); text-decoration: none; font-weight: 800; font-size: 17px;
+  background: var(--brand); color: var(--brand-ink);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.22) 0 40%, transparent 40%);
+  box-shadow: 3px 3px 0 var(--ink); transition: transform .06s, box-shadow .06s;
+}
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.btn.ghost { background-color: var(--chip); color: var(--text); }
+.btn.small { min-height: 38px; padding: 0 14px; font-size: 15px; box-shadow: 2px 2px 0 var(--ink); }
+.btn.big { min-height: 60px; padding: 0 28px; font-size: 21px; box-shadow: 5px 5px 0 var(--ink); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 12px; }
+
+/* Screenshots */
+.shots { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 18px; overflow-x: auto; padding: 22px 6px 12px; scroll-snap-type: x mandatory; }
+.shots figure { margin: 0; scroll-snap-align: start; text-align: center; }
+.shots img { width: 100%; height: auto; border: 3px solid var(--ink); border-radius: 22px; box-shadow: 5px 5px 0 var(--ink); background: #110d22; }
+.shots figcaption { font-size: 15px; font-weight: 700; margin-top: 10px; }
+
+/* Feature grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.grid .panel { margin-top: 0; }
+.grid p { margin: 0; color: var(--muted); }
+
+/* Lists */
+.ticks { list-style: none; padding: 0; margin: 0; }
+.ticks li { padding-left: 30px; position: relative; margin: 8px 0; }
+.ticks li::before { content: '✓'; position: absolute; left: 0; top: 0; font-weight: 900; color: var(--brand); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 24px; }
+ol { padding-left: 22px; margin: 0; }
+ol li { margin: 6px 0; }
+
+/* Questions */
+.faq details { padding: 0; margin-top: 14px; }
+.faq summary { cursor: pointer; padding: 16px 18px; font-weight: 800; list-style: none; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; float: right; font-weight: 900; color: var(--brand); }
+.faq details[open] summary::after { content: '–'; }
+.faq details p { padding: 0 18px 16px; margin: 0; }
+
+/* Tip button: comic yellow, a slight tilt and a "THANKS!" starburst (same as in the app) */
+.tip-wrap { position: relative; padding: 10px 4px 6px; max-width: 420px; }
+.btn.tip {
+  position: relative; width: 100%; min-height: 58px; padding-right: 64px;
+  background-color: #ffb52e; color: #1a1433; font-size: 19px; font-weight: 800;
+  transform: rotate(-1.5deg); box-shadow: 5px 5px 0 var(--ink);
+}
+.btn.tip:active { transform: rotate(-1.5deg) translate(4px, 4px); box-shadow: 1px 1px 0 var(--ink); }
+.tip-cup { font-size: 22px; margin-right: 10px; }
+.tip-burst {
+  position: absolute; top: -18px; right: -8px; z-index: 2; pointer-events: none; width: 86px; height: 86px;
+  display: grid; place-items: center; transform: rotate(12deg); background: var(--ink);
+  clip-path: polygon(50% 0%, 61% 20%, 82% 10%, 78% 33%, 100% 40%, 82% 55%, 95% 76%, 72% 76%, 65% 100%, 50% 83%, 35% 100%, 28% 76%, 5% 76%, 18% 55%, 0% 40%, 22% 33%, 18% 10%, 39% 20%);
+}
+.tip-burst span {
+  width: 78px; height: 78px; display: grid; place-items: center; background: #1fd1aa; color: #04201a;
+  font-size: 10px; font-weight: 900; clip-path: inherit;
+}
+
+.final { text-align: center; margin: 34px 0 10px; }
+footer { text-align: center; padding: 20px 16px 36px; color: var(--muted); }
+footer p { margin: 4px 0; }
+footer a { color: var(--muted); }

@@ -4,6 +4,10 @@
    Every release adds an entry here, in plain words: added, changed, fixed, removed. */
 const CHANGELOG = [
   {
+    v: '1.1.1', date: '2026-11-01',
+    changed: ['Bill Planner now has its own web page at jwjones35.github.io/billplanner-app, and the app itself is at jwjones35.github.io/billplanner-app/app. If you added the app to your Home Screen before this, it still works: the page has an "Open Bill Planner" button, or you can add the app again from its new address.']
+  },
+  {
     v: '1.1.0', date: '2026-11-01',
     added: ['A "Buy me a coffee" button under More, for anyone who\'d like to support the app with a tip. It\'s completely optional, and Bill Planner stays free.']
   },

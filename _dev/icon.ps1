@@ -1,7 +1,7 @@
 # Draws the app icon in the app's inked-comic style: a calendar page with a dollar sign, thick black outlines,
 # a hard drop shadow and halftone dots on a deep purple background (the dark theme's colors).
 Add-Type -AssemblyName System.Drawing
-$out = Join-Path (Split-Path $PSScriptRoot -Parent) 'icons'
+$out = Join-Path (Split-Path $PSScriptRoot -Parent) 'app\icons'
 function C([int]$r, [int]$g, [int]$b, [int]$a = 255) { [System.Drawing.Color]::FromArgb($a, $r, $g, $b) }
 function RoundRect([double]$x, [double]$y, [double]$w, [double]$h, [double]$r) {
     $p = New-Object System.Drawing.Drawing2D.GraphicsPath
