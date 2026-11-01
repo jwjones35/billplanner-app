@@ -2,7 +2,7 @@
 /* Bill Planner: bills, paydays and what's available to spend.
    Everything is stored on this device only (localStorage). No server, no tracking. */
 
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '1.1.2';
 const KEY = 'bpapp.v1';
 const DAY = 86400000;
 
@@ -1312,16 +1312,10 @@ function lockPage(on) {
     window.scrollTo(0, pageScrollY);
   }
 }
-/* opts.locked: a question that must be answered (gas-station purchases). It has no Close button, can't be swiped or
-   tapped away, and other pop-ups can't replace it; only its own answer buttons close it. */
-const sheetLocked = () => !$('#sheet').hidden && $('#sheet').dataset.locked === '1';
-function openSheet(html, opts) {
+function openSheet(html) {
   const sh = $('#sheet');
-  const locked = !!(opts && opts.locked);
-  if (sheetLocked() && !locked) return false;
   // The top bar sits outside the scrolling area, and only .sheet-body scrolls (more reliable on iPhone).
-  sh.innerHTML = `<div class="sheet-top"><span class="grab" aria-hidden="true"></span><span class="sheet-ver">Bill Planner ${APP_VERSION}</span>${locked ? '<span class="sheet-must">Answer to continue</span>' : '<button type="button" class="sheet-x" data-act="close">Close ✕</button>'}</div><div class="sheet-body">${html}</div>`;
-  sh.dataset.locked = locked ? '1' : ''; if (!locked) delete sh.dataset.q;
+  sh.innerHTML = `<div class="sheet-top"><span class="grab" aria-hidden="true"></span><span class="sheet-ver">Bill Planner ${APP_VERSION}</span><button type="button" class="sheet-x" data-act="close">Close ✕</button></div><div class="sheet-body">${html}</div>`;
   sh.hidden = false; $('#scrim').hidden = false;
   sh.style.transform = '';
   sh.querySelector('.sheet-body').scrollTop = 0;
@@ -1333,11 +1327,8 @@ function openSheet(html, opts) {
   if (f && !('ontouchstart' in window)) f.focus();
   return true;
 }
-// force: only a locked question's own answer closes it.
-function closeSheet(force) {
+function closeSheet() {
   const sh = $('#sheet');
-  if (sheetLocked() && force !== true) { sh.style.transform = ''; return; }
-  sh.dataset.locked = ''; delete sh.dataset.q;
   sh.hidden = true; $('#scrim').hidden = true; sh.innerHTML = ''; sh.style.transform = '';
   lockPage(false);
 }
@@ -1366,7 +1357,7 @@ function formError(f, msg, field) {
   sh.addEventListener('touchmove', e => {
     if (startY == null) return;
     dy = e.touches[0].clientY - startY;
-    if (dy > 0 && (fromBar || bodyTop())) { if (!sheetLocked()) sh.style.transform = `translateY(${dy}px)`; e.preventDefault(); }
+    if (dy > 0 && (fromBar || bodyTop())) { sh.style.transform = `translateY(${dy}px)`; e.preventDefault(); }
     else { sh.style.transform = ''; if (!fromBar) startY = null; }
   }, { passive: false });
   sh.addEventListener('touchend', () => {
@@ -1459,11 +1450,10 @@ function sheetBill(b, draft) {
     <label for="bFee">Transaction fee charged with it</label><input id="bFee" name="fee" inputmode="decimal" value="${money2(x.fee)}" placeholder="Optional, for example 2.25">
     <p class="hint">A small extra charge that comes with this bill on the same day. It's added to the bill's total.</p>
     <label class="check"><input type="checkbox" name="varies"${x.varies ? ' checked' : ''}> The amount changes (like electric or water)</label>
-    <p class="hint">Adds this bill to the weekly entertainment limit in the spending watch. It's still a bill for "Available to spend".</p>
     <label class="check"><input type="checkbox" name="autopay"${x.autopay ? ' checked' : ''}> Paid automatically (autopay)</label>
     <p class="hint">The company takes the money by itself. After the due date, the app waits for the charge to show at the bank instead of calling the bill past due, and warns you if it still hasn't come out after 3 business days.</p>
     <label for="bMatch">How the bank shows it</label><input id="bMatch" name="match" value="${esc((x.match || []).join(', '))}" autocapitalize="characters" placeholder="Filled in when you confirm a bank payment">
-    <p class="hint">Words from the bank's description used to recognize this bill, for example TOWN MULDROW. Only used for matching; the name above is what you see. Separate several with commas.</p>
+    <p class="hint">Words from the bank's description used to recognize this bill, for example CITY UTILITIES. Only used for matching; the name above is what you see. Separate several with commas.</p>
     <label class="check"><input type="checkbox" name="active"${x.active === false ? '' : ' checked'}> Still paying this</label>
     <label for="bNote">Note</label><input id="bNote" name="note" value="${esc(x.note || '')}" placeholder="Optional">
     ${hist.length ? `<label>Recent payments</label><div class="small num">${hist.map(p => `<div class="toolbar"><span>${nice(p.due)}</span><span>${fm(p.amount)}${p.fee ? ` <span class="${b && b.fee && p.fee > b.fee + 0.01 ? 'neg' : 'muted'}">(includes ${fm(p.fee)} fee)</span>` : ''}</span></div>`).join('')}</div>` : ''}
