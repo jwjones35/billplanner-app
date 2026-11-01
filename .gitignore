@@ -12,3 +12,6 @@ Thumbs.db
 desktop.ini
 *.tmp
 *.log
+
+# Screenshot helper (local only)
+_shots/
