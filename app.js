@@ -2,7 +2,7 @@
 /* Bill Planner: bills, paydays and what's available to spend.
    Everything is stored on this device only (localStorage). No server, no tracking. */
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const KEY = 'bpapp.v1';
 const DAY = 86400000;
 
@@ -1206,6 +1206,10 @@ function viewMore() {
   <h2>Profile</h2><div class="card"><button class="row" data-act="profile"><span class="main">
     <div class="name">${pr && pr.name ? esc(pr.name) : 'Who uses this phone?'}</div>
     <div class="sub">${pr && pr.name ? 'This phone · tap to change' : 'Tap to add your name, so your own paychecks show as "Me"'}</div></span></button></div>
+  <h2>Support Bill Planner</h2><div class="card pad">
+    <p style="margin-top:0">Bill Planner is free, with no ads and no tracking, and it's made by one person. If it helps you, a small tip keeps it going and helps pay for new features.</p>
+    ${tipButton()}
+    <p class="hint">Opens Buy Me a Coffee, a separate website. Tipping is completely optional; the app stays free either way.</p></div>
   <h2>About</h2><div class="card"><button class="row" data-act="whatsNew"><span class="main"><div class="name">What's new</div><div class="sub">Version ${APP_VERSION} · see what changed in each update</div></span></button>
     <button class="row" data-act="aboutApp"><span class="main"><div class="name">Privacy and important notes</div><div class="sub">Where your information is kept, and what this app is and isn't</div></span></button></div>
   <h2>Bank connection</h2><div class="card">${bankAccess()
@@ -1262,6 +1266,12 @@ function viewWelcome() {
     <a href="#" data-act="aboutApp">Privacy and important notes</a></p>`;
 }
 
+/* ---------- tips ----------
+   A link to the developer's Buy Me a Coffee page. Nothing is sent from the app: it just opens that website. */
+const TIP_URL = 'https://buymeacoffee.com/jwjones35';
+const tipButton = () => `<div class="tip-wrap"><a class="btn tip" href="${TIP_URL}" target="_blank" rel="noopener">
+  <span class="tip-cup" aria-hidden="true">☕</span>Buy me a coffee</a><div class="tip-burst" aria-hidden="true"><span>THANKS!</span></div></div>`;
+
 /* ---------- privacy and important notes ----------
    Shown once before someone starts, and any time from More › About or the welcome screen. */
 const FIRST_KEY = 'bpapp.firstNote';
@@ -1274,7 +1284,9 @@ const aboutHtml = () => `
   <p><b>This app is a planning tool, not financial advice.</b> Its numbers are only as good as what's entered and what
     your bank reports. Always check your bank before making a payment you can't undo.</p>
   <p><b>Make backups.</b> Deleting the app, clearing your browser's data or losing the phone erases what's in it.
-    Save a backup file now and then from More › Backup.</p>`;
+    Save a backup file now and then from More › Backup.</p>
+  <p><b>Tips are optional.</b> The tip button under More opens Buy Me a Coffee, a separate website. Bill Planner
+    stays free whether you tip or not.</p>`;
 function sheetAbout() {
   openSheet(`<h3>Privacy and important notes</h3>${aboutHtml()}<div class="btns"><button class="btn block" data-act="close">Got it</button></div>`);
 }

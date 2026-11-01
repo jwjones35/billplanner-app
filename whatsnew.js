@@ -4,6 +4,10 @@
    Every release adds an entry here, in plain words: added, changed, fixed, removed. */
 const CHANGELOG = [
   {
+    v: '1.1.0', date: '2026-11-01',
+    added: ['A "Buy me a coffee" button under More, for anyone who\'d like to support the app with a tip. It\'s completely optional, and Bill Planner stays free.']
+  },
+  {
     v: '1.0.0', date: '2026-11-01',
     added: [
       'Bills and paydays in one place, with what\'s available to spend until your next payday.',
