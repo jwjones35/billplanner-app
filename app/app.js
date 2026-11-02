@@ -2,7 +2,7 @@
 /* Bill Planner: bills, paydays and what's available to spend.
    Everything is stored on this device only (localStorage). No server, no tracking. */
 
-const APP_VERSION = '1.1.2';
+const APP_VERSION = '1.2.0';
 const KEY = 'bpapp.v1';
 const DAY = 86400000;
 
@@ -355,7 +355,9 @@ async function fetchBank(force) {
   let log = S.bank.fetchLog || {};
   if (log.day !== today()) log = { day: today(), count: 0 };
   if (!force && S.bank.fetchedAt && now - S.bank.fetchedAt < HOUR) return;
-  if (force && S.bank.fetchedAt && now - S.bank.fetchedAt < 2 * 60000) { toast('Updated a moment ago already.'); return; }
+  if (force === true && S.bank.fetchedAt && now - S.bank.fetchedAt < 2 * 60000) { toast(noNewerText()); return; }
+  if (force === 'fix' && S.bank.fetchedAt && now - S.bank.fetchedAt < 60000) return;
+  const prevAsOf = bankAsOf();
   if (log.count >= 20) { S.bank.error = "Today's update limit is reached. It will update again tomorrow."; save(); render(); return; }
   bankBusy = true; render();
   try {
@@ -375,11 +377,95 @@ async function fetchBank(force) {
     const errs = (j.errlist || j.errors || []).map(e => typeof e === 'string' ? e : (e.msg || e.message || e.code || '')).filter(Boolean);
     S.bank.error = errs.length ? errs.join(' ') : null;
     S.bank.fetchedAt = now;
+    // Tapping "Update now" says plainly whether the bank actually sent anything newer.
+    if (force === true && !S.bank.error) toast(bankAsOf() && bankAsOf() === prevAsOf ? noNewerText() : `New balance from ${bankName()}${bankAsOf() ? ' (as of ' + whenText(bankAsOf()) + ')' : ''}.`);
   } catch (e) {
     S.bank.error = e.message || "Couldn't update from the bank.";
   }
   bankBusy = false;
   save(); render();
+}
+
+/* ---------- when the bank connection breaks, goes quiet, or is hours behind ----------
+   A big red banner at the top of Home when the connection is broken or the data is over 36 hours old, so an old
+   balance is never shown as if it were current, with a step-by-step guide to fix it. S.bank.fixAt: when the user
+   went to SimpleFIN to fix it. SimpleFIN is a copy of the bank that it refreshes only about once a day, so the
+   balance's age is always shown under "Available to spend", with an orange warning once it's over 3 hours old. */
+const SIMPLEFIN_URL = 'https://bridge.simplefin.org/';
+function bankProblem() {
+  if (!S || !bankOn()) return null;
+  const m = manualBal(), freshHand = !!(m && Date.now() - m.at < 12 * HOUR);
+  if (S.bank.error) return { kind: 'error', msg: S.bank.error, freshHand };
+  const asOf = bankAsOf();
+  if (asOf && Date.now() - asOf > 36 * HOUR && !freshHand) return { kind: 'old', asOf, freshHand };
+  return null;
+}
+// True when the big "Available to spend" number can't be trusted right now.
+const notCurrent = () => { const p = bankProblem(); return !!(p && !p.freshHand); };
+const BEHIND = 3 * HOUR;
+// When the balance "Available to spend" starts from was true: the one typed in, or the bank's.
+const balanceAt = () => { const m = manualBal(); return m ? m.at : bankAsOf(); };
+const whenAt = ms => whenText(ms).replace(/^(today|yesterday) /, '$1 at ');
+const noNewerText = () => `Checked just now. SimpleFIN hasn't received anything newer from ${bankName()} since ${whenAt(bankAsOf())}.`;
+function bankBehind() {
+  if (!S || !bankOn() || bankBusy || bankProblem()) return null;
+  const at = balanceAt();
+  return at && Date.now() - at > BEHIND ? at : null;
+}
+function balanceAgeHtml() {
+  if (!bankOn()) return '';
+  if (bankBusy) return `<div class="as-of">Updating from ${esc(bankName())}...</div>`;
+  const at = balanceAt(); if (!at) return '';
+  const who = manualBal() ? 'You entered this balance' : `${esc(capFirst(bankName()))}'s balance as of`;
+  return `<div class="as-of${bankBehind() ? ' old' : ''}">${who} ${whenAt(at)} (${timeAgo(at)}). Anything spent since then isn't included yet.</div>`;
+}
+function bankBehindHtml() {
+  const at = bankBehind(); if (!at) return '';
+  const bank = esc(bankName());
+  return `<div class="bank-behind">
+    <div class="bb-title">This balance is about ${timeAgo(at).replace(' ago', '')} old</div>
+    <p>${manualBal() ? 'You entered it' : `SimpleFIN last got it from ${bank}`} ${whenAt(at)}. Spending since then isn't counted, so the real amount may be lower. <b>Check ${bank}'s own app before spending.</b></p>
+    <div class="btns"><button class="btn" data-act="balances">Enter today's balance</button><button class="btn ghost" data-act="bankRefresh">Check the bank now</button></div>
+  </div>`;
+}
+function bankAlertHtml() {
+  const p = bankProblem(); if (!p) return '';
+  const bank = esc(bankName()), m = manualBal();
+  const title = p.kind === 'error' ? `Your connection to ${bank} stopped working` : `${capFirst(bank)} hasn't sent new information since ${whenText(p.asOf)}`;
+  const now = p.freshHand
+    ? `<p>"Available to spend" is using the balance you entered (${whenText(m.at)}), so it's right for now. Anything spent after that isn't counted until the connection works again.</p>`
+    : `<p><b>"Available to spend" below is NOT current.</b> Check your balance in ${bank}'s own app before spending anything.</p>`;
+  const why = p.kind === 'error' ? `<p class="small">SimpleFIN says: "${esc(p.msg)}"</p>` : '';
+  const btns = p.kind === 'error'
+    ? (S.bank.fixAt
+      ? `<button class="btn" data-act="bankFixCheck">I'm done on SimpleFIN: check now</button><button class="btn ghost" data-act="bankFix">Show the steps again</button>`
+      : `<button class="btn" data-act="bankFix">Fix the connection</button>`)
+    : `<button class="btn" data-act="bankRefresh">Check the bank now</button>`;
+  return `<div class="bank-alert" role="alert"><div class="ba-title">⚠ ${title}</div>${now}${why}
+    <div class="btns">${btns}${p.freshHand ? '' : `<button class="btn ghost" data-act="balances">Enter today's balance</button>`}</div></div>`;
+}
+// Step 1: reconnect on SimpleFIN's website.
+function sheetBankFix() {
+  const bank = esc(bankName());
+  openSheet(`<h3>Fix the bank connection</h3><p class="small muted" style="margin-top:0">Step 1 of 2</p>
+    <p>Tap <b>Open SimpleFIN</b> and sign in. Next to <b>${bank}</b>, tap <b>Adjust</b> and follow its steps. ${bank} may text you a code to type in.</p>
+    <p>When SimpleFIN shows <b>OK</b> next to ${bank}, come back to this app. It checks the connection by itself.</p>
+    <div class="btns"><button class="btn block" data-act="bankFixGo">Open SimpleFIN</button></div>`);
+}
+// Step 2: check that it works. manual: the user tapped the button (show what's still wrong).
+async function bankFixCheck(manual) {
+  if (!S || !S.bank.fixAt) return;
+  if (!manual && Date.now() - S.bank.fixAt > 6 * HOUR) { S.bank.fixAt = null; save(); return; }
+  await fetchBank('fix');
+  if (!S.bank.error) { S.bank.fixAt = null; save(); render(); closeSheet(); toast(`Your connection to ${bankName()} is working again.`); return; }
+  if (manual) {
+    const bank = esc(bankName());
+    openSheet(`<h3>Not working yet</h3><p class="small muted" style="margin-top:0">Step 2 of 2</p>
+      <p>SimpleFIN still says: "${esc(S.bank.error)}"</p>
+      <p>Right after reconnecting, this message often stays for a few minutes while SimpleFIN checks ${bank} again. Wait 5 minutes, then tap <b>Check again</b>.</p>
+      <p class="small">If SimpleFIN doesn't show <b>OK</b> next to ${bank}, go back to step 1.</p>
+      <div class="btns"><button class="btn ghost" data-act="bankFix">Back to step 1</button><button class="btn" data-act="bankFixCheck">Check again</button></div>`);
+  }
 }
 
 function applyBank(j, now) {
@@ -985,19 +1071,20 @@ function viewHome() {
     `<button class="row" data-act="${act}"><span class="dot ${done ? 'ok' : 'soon'}"></span><span class="main"><div class="name">${done ? '✓ ' : `${i + 1}. `}${name}</div><div class="sub">${done ? 'Done' : sub}</div></span></button>`).join('')}
     <div class="empty">After these three, the big number below shows what's available to spend until your next payday.</div></div>`;
   let h = `<h1>Bills</h1>
+  ${bankAlertHtml()}
+  ${bankBehindHtml()}
   ${setupHtml}
-  ${statusHtml(c, nw)}
-  <div class="card hero">
-    <div class="label">Available to spend ${c.hasPay ? `until payday, ${nice(c.np)}` : 'for the next 2 weeks'}</div>
+  ${notCurrent() ? '' : statusHtml(c, nw)}
+  <div class="card hero${notCurrent() ? ' not-current' : ''}">
+    <div class="label">Available to spend ${c.hasPay ? `until payday, ${nice(c.np)}` : 'for the next 2 weeks'}${notCurrent() ? ' <span class="nc-tag">NOT CURRENT</span>' : ''}</div>
     <div class="big num ${c.safe < 0 ? 'neg' : ''}">${fm(c.safe)}</div>
+    ${balanceAgeHtml()}
     <details><summary>How this is worked out</summary>
     <div class="small muted" style="margin-top:6px">Checking minus the bills due before payday.${nw ? '' : ' Bills after payday are not included, so keep some back for next week.'}</div>
     ${bankOn()
       ? (manualBal()
         ? `<div class="small muted" style="margin-top:4px">Using the balance you entered from your bank's app (${whenText(manualBal().at)}) until the bank connection has newer data · <a href="#" data-act="balances">Change</a></div>`
-        : `<div class="small muted" style="margin-top:4px">${bankBusy ? `Updating from ${esc(bankName())}...` : `<a href="#" data-act="balances">${bankAgeText()}</a> (updates about once a day) · <a href="#" data-act="balances">Balance details, or enter today's balance from your bank's app</a>`}</div>
-         ${!bankBusy && Date.now() - bankAsOf() > 36 * HOUR ? `<div class="small" style="margin-top:4px;color:var(--warn)">The bank data is over a day old, so recent purchases may be missing. For an up-to-the-minute number, enter today's balance from your bank's app.</div>` : ''}`)
-        + (S.bank.error ? `<div class="small neg" style="margin-top:4px">${esc(S.bank.error)}</div>` : '')
+        : `<div class="small muted" style="margin-top:4px">${bankBusy ? `Updating from ${esc(bankName())}...` : `<a href="#" data-act="balances">${bankAgeText()}</a> (updates about once a day) · <a href="#" data-act="balances">Balance details, or enter today's balance from your bank's app</a>`}</div>`)
       : `<div class="small muted" style="margin-top:4px">${stale} · <a href="#" data-act="balances">Update</a></div>`}
       <div class="breakdown num">
         ${bankOn() ? `<div><span>${manualBal() ? "Checking (entered from your bank's app)" : `Checking at ${esc(bankName())}`}</span><span>${fm(manualBal() ? manualBal().amount : S.bank.bal.checking)}</span></div>
@@ -1791,6 +1878,9 @@ document.addEventListener('click', e => {
     case 'bankConnect': sheetConnect(); break;
     case 'bankAccounts': if (S.bank.accounts.length) sheetAccounts(); else toast('Update from the bank first.'); break;
     case 'bankRefresh': fetchBank(true); break;
+    case 'bankFix': sheetBankFix(); break;
+    case 'bankFixGo': S.bank.fixAt = Date.now(); save(); window.open(SIMPLEFIN_URL, '_blank', 'noopener'); closeSheet(); render(); break;
+    case 'bankFixCheck': bankFixCheck(true); break;
     case 'bankDisconnect':
       if (confirm('Disconnect the bank from this phone? Your bills and history stay. To stop it completely, also remove the app connection on SimpleFIN.')) {
         setBankAccess('');
@@ -2160,7 +2250,8 @@ document.addEventListener('focusin', e => {
 // Re-draw when the app comes back to the front (the date may have changed).
 // The bank (if connected) is checked too.
 async function refreshAll() {
-  await fetchBank(false);
+  // Back from fixing the connection on SimpleFIN: check it right away.
+  if (S && S.bank.fixAt) await bankFixCheck(false); else await fetchBank(false);
   if (!S) return;
   render();
 }

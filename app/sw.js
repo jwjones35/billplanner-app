@@ -1,6 +1,6 @@
 // Offline support: keeps a copy of the app's own files so it opens without a connection.
 // Bump VERSION whenever any app file changes, so phones pick up the update.
-const VERSION = 'bpa-app-1.1.2';
+const VERSION = 'bpa-app-1.2.0';
 const PREFIX = 'bpa-app-'; // only this app's saved copies are ever cleaned up (other apps may share this web address)
 const FILES = ['./', 'index.html', 'styles.css', 'whatsnew.js', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];

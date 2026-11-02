@@ -4,6 +4,15 @@
    Every release adds an entry here, in plain words: added, changed, fixed, removed. */
 const CHANGELOG = [
   {
+    v: '1.2.0', date: '2026-11-01',
+    added: [
+      'If your bank connection stops working, a big red warning now shows at the top of Home, "Available to spend" is crossed out and marked NOT CURRENT, and a "Fix the connection" button walks you through reconnecting on SimpleFIN. The app checks by itself when you come back.',
+      'Under "Available to spend" the app now always says when the bank\'s balance is from, for example "as of today at 11:43 AM (6 hours ago)". SimpleFIN only gets new numbers from your bank about once a day, so anything spent since then isn\'t included yet.',
+      'When the balance is more than 3 hours old, an orange warning says to check your bank\'s own app before spending, with a button to enter today\'s balance.'
+    ],
+    changed: ['"Update now" now says plainly whether your bank sent anything new, instead of "Updated a moment ago already".']
+  },
+  {
     v: '1.1.2', date: '2026-11-01',
     fixed: ['On the bill form, the note under "The amount changes" described a feature this app doesn\'t have. It\'s gone now.', 'Some unused behind-the-scenes code was removed. Nothing else changes.']
   },
